@@ -4,42 +4,71 @@ __lua__
 -- frogsgame
 -- by mwolf and yvonnedo69
 
---keroppi position
-k=1
---left foot 0, right foot 1
-f=0
---casting 0 no 1 yes
-c=0
---bobber pos, hor/vert
-h=0
+k=1 --keroppi position
+f=0 --left foot 0, right foot 1
+c=0 --casting 0 no 1 yes
+h=0 --bobber pos, hor/vert
 v=0
 
---bobber bob
-b=0
+b=0 --bobber bob
 
---watermove
-w=0
+w=0 --watermove
 y=0
 
---fish position
-fp=75 + rnd(35)
--- fish sprite/direction 41 is left, 42 is right
-fs=41
+fp=75 + rnd(35) --fish position
+fs=41 -- fish sprite/direction 41 is left, 42 is right
+fp2=80 + rnd(30) --fish2 position
+fs2=42 -- fish2 sprite/direction 41 is left, 42 is right
+fp3=80 + rnd(30) --fish position
+fs3=57 -- fish sprite/direction 57 is left, 58 is right
 
---fish position
-fp2=80 + rnd(30)
--- fish sprite/direction 41 is left, 42 is right
-fs2=42
+fpx=80 --frog position
+fpy=105
+fpdx=0 --frog direction
+fpdy=0
+fspr=0 --frog sprite
 
---fish position
-fp3=80 + rnd(30)
--- fish sprite/direction 57 is left, 58 is right
-fs3=57
+function draw_keroppi(x)
+
+	if (c==0) then 	--body
+		sspr(56,0,24,16,x,44)
+		spr(10,x+8,36)
+	elseif (c<15) then --momentary panic
+		sspr(88,0,24,16,x,44)
+		spr(26,x+23,39)
+		cast()
+	else --back to normal
+		sspr(112,8,16.8,8,x,44)
+		spr(13,x+16,44)
+		spr(26,x+23,39)
+		spr(23,x,52)
+		spr(24,x+8,52)
+		spr(29,x+16,52)
+		cast()
+	end
+
+	if (f==0) then --feet
+		sspr(56,16,16,8,x,60)
+	else
+		sspr(56,24,16,8,x,60)
+	end
+	move_water()
+end
+
+function cast()
+	if (b==0) then
+		spr(18,k+25+h,67+v)
+		line(k+31,43,k+29+h,68+v,6)
+	else
+		spr(19,k+25+h,67+v)
+		line(k+31,43,k+29+h,69+v,6)
+	end
+	move_water()
+end
 
 function move_water()
 
-	--move fish1
-	if (w - flr(w/9)*9==0) then
+	if (w - flr(w/9)*9==0) then --move fish1
 		if (fs==41) then
 			fp=fp-1
 		else
@@ -47,8 +76,7 @@ function move_water()
 		end
 	end
 
-	--move fish2
-	if (w - flr(w/7)*7==0) then
+	if (w - flr(w/7)*7==0) then --move fish2
 		if (fs2==41) then
 			fp2=fp2-1
 		else
@@ -56,8 +84,7 @@ function move_water()
 		end
 	end
 
-	--move fish3
-	if (w - flr(w/5)*5==0) then
+	if (w - flr(w/5)*5==0) then --move fish3
 		if (fs3==57) then
 			fp3=fp3-1
 		else
@@ -65,10 +92,8 @@ function move_water()
 		end
 	end
 
-
 	if (w>75) then
 		w=0
-
 		if (y==0) then
 			y=1
 		else
@@ -77,6 +102,7 @@ function move_water()
 	else
 		w=w+1
 	end
+	-- lord forgive me for this water
 	if (y==1) then
 		mset(6,3,36)
 		mset(7,3,37)
@@ -164,88 +190,66 @@ function move_water()
 			c = c+1
 		end
 	end
+	draw_frog()
 end
 
-function cast()
-	if (b==0) then
-		spr(18,k+25+h,67+v)
-		line(k+31,43,k+29+h,68+v,6)
+function draw_frog()
+	--going right
+	if fpdx == 0 then
+		if fpx < 120 then
+			fpx = fpx + 0.15 + (1 * (121-fpx)/50)
+		else
+			fpdx = 1
+		end
+	--going left
 	else
-		spr(19,k+25+h,67+v)
-		line(k+31,43,k+29+h,69+v,6)
+		if fpx > 60 then
+			fpx = fpx - 0.15 - (1 * (fpx-59)/50)
+		else
+			fpdx = 0
+		end
 	end
-	move_water()
-end
 
-function draw_keroppi(x)
-
-	--body
-	if (c==0) then
-		spr(7,x,44)
-		spr(8,x+8,44)
-		spr(9,x+16,44)
-		spr(10,x+8,36)
-		spr(23,x,52)
-		spr(24,x+8,52)
-		spr(25,x+16,52)
-	elseif (c<15) then
-		--momentary panic
-		spr(11,x,44)
-		spr(12,x+8,44)
-		spr(13,x+16,44)
-		spr(26,x+23,39)
-		spr(27,x,52)
-		spr(28,x+8,52)
-		spr(29,x+16,52)
-		cast()
+	--going up
+	if fpdy == 0 then
+		if fpy < 80 then
+			fpy = fpy + 0.15 + sin(fpx)
+		else
+			fpdy =1
+		end
 	else
-		--back to normal
-		spr(30,x,44)
-		spr(31,x+8,44)
-		spr(13,x+16,44)
-		spr(26,x+23,39)
-		spr(23,x,52)
-		spr(24,x+8,52)
-		spr(29,x+16,52)
-		cast()
+		if fpy > 16 then
+			fpy = fpy - 0.15 -  0.15 - sin(fpx)
+		else
+			fpdy =0
+		end
+	end
+
+	if flr(rnd(30)) < 1 then
+		if fspr == 0 then
+			fspr = 1
+		else
+			fspr = 0
+		end
 	end
 
 
-	--feet
-	if (f==0) then
-		spr(39,x,60)
-		spr(40,x+8,60)
-	else
-		spr(55,x,60)
-		spr(56,x+8,60)
-	end
-	move_water()
-end
+	palt(0, false)
+	palt(1, true)
 
+	if fspr == 0 then
+		sspr(8,16.16,16,16,fpx,fpy)
+	else
+		sspr(8,16.16,16,16,fpx,fpy,16,16,true)
+	end
+	palt(0, true)
+	palt(1, false)
+end
 
 function _draw()
 	cls(12)
 
 	map(0,0,0,48,16,10)
-
-	----water
-	--rectfill(54,88,127,127,1)
-	--
-	--for i=0, 1 do
-	--	--land
-	--	spr(4,0+24*i,80)
-	--	spr(5,8+24*i,80)
-	--	spr(6,16+24*i,80)
-	--end
-	----dock
-	--spr(1,48,80)
-	--spr(2,56,80)
-	--spr(17,64,80)
-	--spr(2,72,80)
-	--spr(3,80,80)
-	--
-
-
 
 	print("you are keroppi",
 	      34, 2, 7)
