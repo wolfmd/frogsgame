@@ -27,10 +27,14 @@ fpy=105
 fpdx=0 --frog direction
 fpdy=0
 fspr=0 --frog sprite
+caught=0
 
 function draw_keroppi(x)
 
 	if (c==0) then 	--body
+		caught=0
+		h=5000
+		v=5000
 		sspr(56,0,24,16,x,44)
 		spr(10,x+8,36)
 	elseif (c<15) then --momentary panic
@@ -56,6 +60,17 @@ function draw_keroppi(x)
 end
 
 function cast()
+	if caught == 1 then
+		 if v > -20 then
+			v = v-2
+		    fpy = fpy -2
+			if h < k+8 then
+			   h=h-1
+			   fpx=fpx-1
+			end
+
+		 end
+	end
 	if (b==0) then
 		spr(18,k+25+h,67+v)
 		line(k+31,43,k+29+h,68+v,6)
@@ -160,6 +175,8 @@ function move_water()
 		mset(14,5,37)
 		mset(14,5,38)
 	end
+	palt(0, false)
+	palt(1, true)
 
 	--determine fish1 dir
 	if (fp<62) then
@@ -185,6 +202,9 @@ function move_water()
 	end
 	spr(fs3,fp3,107)
 
+	palt(1, false)
+	palt(0, true)
+
 	if (c>0) then
 		if (c<15) then
 			c = c+1
@@ -194,50 +214,55 @@ function move_water()
 end
 
 function draw_frog()
-	--going right
-	if fpdx == 0 then
-		if fpx < 120 then
-			fpx = fpx + 0.15 + (1 * (121-fpx)/50)
-		else
-			fpdx = 1
-		end
-	--going left
-	else
-		if fpx > 60 then
-			fpx = fpx - 0.15 - (1 * (fpx-59)/50)
-		else
-			fpdx = 0
-		end
+
+
+	--check catch
+	if h+k+20 < fpx and fpx < h+k+30 and v+64< fpy and fpy < v+70 then
+		print("you caught 'im!",
+	      37, 80, 7)
+		caught=1
 	end
 
-	--going up
-	if fpdy == 0 then
-		if fpy < 80 then
-			fpy = fpy + 0.15 + sin(fpx)
-		else
-			fpdy =1
-		end
-	else
-		if fpy > 16 then
-			fpy = fpy - 0.15 -  0.15 - sin(fpx)
-		else
-			fpdy =0
-		end
-	end
+	if caught==0 then
 
-	if flr(rnd(30)) < 1 then
-		if fspr == 0 then
-			fspr = 1
+		--going right
+		if fpdx == 0 then
+			if fpx < 120 then
+				fpx = fpx + 0.15 + (1 * (121-fpx)/50)
+			else
+				fpdx = 1
+			end
+			--going left
 		else
-			fspr = 0
+			if fpx > 60 then
+				fpx = fpx - 0.15 - (1 * (fpx-59)/50)
+			else
+				fpdx = 0
+			end
 		end
+
+		--going up
+		if fpdy == 0 then
+			if fpy < 110 then
+				fpy = fpy + 0.15 + (1 * (121-fpx)/50)
+			else
+				fpdy =1
+			end
+		else
+			if fpy > 70 then
+				fpy = fpy - 0.15 - (1 * (fpx-59)/50)
+			else
+				fpdy =0
+			end
+		end
+
 	end
 
 
 	palt(0, false)
 	palt(1, true)
 
-	if fspr == 0 then
+	if fpdy == 0 then
 		sspr(8,16.16,16,16,fpx,fpy)
 	else
 		sspr(8,16.16,16,16,fpx,fpy,16,16,true)
